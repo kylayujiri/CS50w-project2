@@ -1,0 +1,37 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    {% if is_my_profile %}
+        My Watchlist - Auctions
+    {% else %}
+        {{ username.username }}'s Watchlist - Auctions
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+
+    {% if is_my_profile %}
+        <h2>My Watchlist</h2>
+    {% else %}
+        <h2>{{ username.username }}'s Watchlist</h2>
+    {% endif %}
+
+    {% for item in watchlist %}
+        <div class="card mb-3" style="max-width: 540px;">
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    <img src="{{ item.image_link }}" class="card-img" alt="Image of {{ item.title }}">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="{% url 'listing' item.pk %}">{{ item.title }}</a></h5>
+                        <p class="card-text">Price: {{ item.get_price }}</p>
+                        <p class="card-text">{{ item.description }}</p>
+                        <p class="card-text"><small class="text-muted">Created: {{ item.creation_time }}</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
