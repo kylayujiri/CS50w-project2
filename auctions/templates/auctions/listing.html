@@ -42,14 +42,15 @@
                 <p>Your bid is the current bid.</p>
             {% endif %}
 
-            <form class="" action="{% url 'listing' listing.pk %}" method="post">
+            <form action="{% url 'listing' listing.pk %}" method="post">
                 {% csrf_token %}
 
-                {% for field in bid_form %}
-                    {{ field }}
-                {% endfor %}
 
-                <br>
+                {% for field in bid_form %}
+                  <div class="form-group">
+                    {{ field }}
+                  </div>
+                {% endfor %}
 
                 <input type="submit" name="new-bid" value="Place Bid">
             </form>
@@ -64,6 +65,7 @@
 
         {% endif %}
 
+        <hr>
         <h3>Details</h3>
 
         <ul>
@@ -74,38 +76,43 @@
 
         {% if is_my_listing %}
             <!-- button for closing the listing -->
-            <form class="" action="{% url 'listing' listing.pk %}" method="post">
+            <form style="display: inline;" action="{% url 'listing' listing.pk %}" method="post">
                 {% csrf_token %}
                 <input type="submit" name="close-listing" value="Close Listing">
             </form>
         {% endif %}
 
         {% if user.is_authenticated %}
-            {% if is_in_my_watchlist %}
-                <form class="" action="{% url 'listing' listing.pk %}" method="post">
-                    {% csrf_token %}
-                    <input type="submit" name="remove-watchlist" value="Remove From My Watchlist">
-                </form>
-            {% else %}
-                <form class="" action="{% url 'listing' listing.pk %}" method="post">
-                    {% csrf_token %}
-                    <input type="submit" name="add-watchlist" value="Add to My Watchlist">
-                </form>
-            {% endif %}
+          <form style="display: inline;" action="{% url 'listing' listing.pk %}" method="post">
+              {% csrf_token %}
+
+              {% if is_in_my_watchlist %}
+                <input type="submit" name="remove-watchlist" value="Remove From My Watchlist">
+              {% else %}
+                <input type="submit" name="add-watchlist" value="Add to My Watchlist">
+              {% endif %}
+
+          </form>
         {% endif %}
 
         <hr>
         <h3>Comments</h3>
 
         {% if user.is_authenticated %}
-            <form class="" action="{% url 'listing' listing.pk %}" method="post">
-                {% csrf_token %}
+
+            <form class="mt-2 mb-4" action="{% url 'listing' listing.pk %}" method="post">
+              {% csrf_token %}
+
                 {% for field in comment_form %}
+                  <div class="form-group">
                     {{ field }}
+                  </div>
                 {% endfor %}
-                <br>
+
                 <input type="submit" name="post-comment" value="Post">
+
             </form>
+
             {% if comment_form.errors %}
                 {% for field in comment_form %}
                     {% for error in field.errors %}

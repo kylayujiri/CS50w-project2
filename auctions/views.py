@@ -23,7 +23,7 @@ class NewBidForm(ModelForm):
         model = Bid
         fields = ['amount','listing']
         widgets = {
-            'amount': forms.TextInput(attrs={'placeholder':'Bid'}),
+            'amount': forms.TextInput(attrs={'placeholder':'Bid', 'class': 'form-control'}),
             'listing': forms.HiddenInput()
         }
 
@@ -49,7 +49,7 @@ class NewCommentForm(ModelForm):
         model = Comment
         fields = ['text',]
         widgets = {
-            'text': forms.TextInput(attrs={'placeholder': 'Your Comment'})
+            'text': forms.TextInput(attrs={'placeholder': 'Your Comment', 'class': 'form-control'})
         }
 
 def index(request):
