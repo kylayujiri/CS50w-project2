@@ -26,7 +26,7 @@ class Listing(models.Model):
     description = models.CharField(max_length=280, blank=False) # same as a tweet :)
     starting_price = models.DecimalField(decimal_places=2, max_digits=10, blank=False, validators=[MinValueValidator(0)])
     category = models.CharField(max_length=2, choices=CATEGORIES, default='0')
-    image_link = models.URLField(blank=True)
+    image_link = models.URLField(blank=True, default="")
     creation_time = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True, null=False)
 
