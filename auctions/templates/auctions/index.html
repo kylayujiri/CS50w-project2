@@ -3,23 +3,28 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    {% for item in listings %}
-        <div class="card mb-3" style="max-width: 540px;">
-            <div class="row no-gutters">
-                {% if item.image_link != "" %}
-                  <div class="col-md-4">
-                      <img src="{{ item.image_link }}" class="card-img" alt="Image of {{ item.title }}">
-                  </div>
-                {% endif %}
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title"><a href="{% url 'listing' item.pk %}">{{ item.title }}</a></h5>
-                        <p class="card-text">Price: {{ item.get_price }}</p>
-                        <p class="card-text">{{ item.description }}</p>
-                        <p class="card-text"><small class="text-muted">Created: {{ item.creation_time }}</small></p>
+    <div class="mt-4">
+
+      {% for item in listings %}
+          <div class="card mb-3" style="max-width: 540px;">
+              <div class="row no-gutters">
+                  {% if item.image_link != "" %}
+                    <div class="col-md-4">
+                        <img src="{{ item.image_link }}" class="card-img" alt="Image of {{ item.title }}">
                     </div>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
+                  {% endif %}
+                  <div class="col-md-8">
+                      <div class="card-body">
+                          <h5 class="card-title"><a href="{% url 'listing' item.pk %}">{{ item.title }}</a></h5>
+                          <p class="card-text">Price: {{ item.get_price }}</p>
+                          <p class="card-text">{{ item.description }}</p>
+                          <p class="card-text"><small class="text-muted">Created: {{ item.creation_time }}</small></p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      {% endfor %}
+
+    </div>
+
 {% endblock %}

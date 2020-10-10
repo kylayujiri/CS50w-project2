@@ -14,7 +14,11 @@ class NewListingForm(ModelForm):
         model = Listing
         fields = ['title', 'description', 'starting_price', 'image_link', 'category']
         widgets = {
-            'description': forms.Textarea(attrs={'cols':80, 'rows':8})
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'cols': 80, 'rows': 8, 'class': 'form-control'}),
+            'starting_price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'image_link': forms.URLInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'})
         }
 
 class NewBidForm(ModelForm):
@@ -23,7 +27,7 @@ class NewBidForm(ModelForm):
         model = Bid
         fields = ['amount','listing']
         widgets = {
-            'amount': forms.TextInput(attrs={'placeholder':'Bid', 'class': 'form-control'}),
+            'amount': forms.TextInput(attrs={'placeholder': 'Bid', 'class': 'form-control'}),
             'listing': forms.HiddenInput()
         }
 
@@ -42,6 +46,9 @@ class CategoryFilter(ModelForm):
     class Meta:
         model = Listing
         fields = ['category',]
+        widgets = {
+            'category': forms.Select(attrs={'class': 'form-control'})
+        }
 
 class NewCommentForm(ModelForm):
 
