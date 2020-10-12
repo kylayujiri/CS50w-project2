@@ -1,73 +1,72 @@
 {% extends "auctions/layout.html" %}
 
 {% block title %}
-    {% if not_found %}
-        User Not Found - Auctions
+  {% if not_found %}
+    User Not Found - Auctions
+  {% else %}
+    {% if is_my_profile %}
+      My Profile - Auctions
     {% else %}
-
-        {% if is_my_profile %}
-            My Profile - Auctions
-        {% else %}
-            {{ username }}'s Profile - Auctions
-        {% endif %}
-
+      {{ username }}'s Profile - Auctions
     {% endif %}
+  {% endif %}
 {% endblock %}
 
 {% block body %}
-    {% if not_found %}
-        <h2>The user <strong>{{ username }}</strong> does not exist.</h2>
+  {% if not_found %}
+    <h2>The user <strong>{{ username }}</strong> does not exist.</h2>
+  {% else %}
+
+    {% if is_my_profile %}
+
+      <h2>My Profile</h2>
+
+      <p>Member since {{ username.date_joined|date:'F Y' }}</p>
+
+      <p>Username: {{ username.username }}</p>
+
+      <p>Email: {{ username.email }}</p>
+
+      <hr>
+
+      <h3>My Listings</h3>
+
     {% else %}
 
-        {% if is_my_profile %}
+      <h2>{{ username.username }}</h2>
 
-            <h2>My Profile</h2>
+      <p>Member since {{ username.date_joined|date:'F Y' }}</p>
 
-            <p>Member since {{ username.date_joined|date:'F Y' }}</p>
+      <p><a href="{% url 'watchlist' username.username %}">{{ username.username }}'s Watchlist</a></p>
 
-            <p>Username: {{ username.username }}</p>
+      <hr>
 
-            <p>Email: {{ username.email }}</p>
-
-            <hr>
-
-            <h3>My Listings</h3>
-
-        {% else %}
-
-            <h2>{{ username.username }}</h2>
-
-            <p>Member since {{ username.date_joined|date:'F Y' }}</p>
-
-            <p><a href="{% url 'watchlist' username.username %}">{{ username.username }}'s Watchlist</a></p>
-
-            <hr>
-
-            <h3>{{ username.username }}'s Listings</h3>
-
-        {% endif %}
-
-        <div class="mt-4">
-          {% for item in listings %}
-              <div class="card mb-3" style="max-width: 540px;">
-                  <div class="row no-gutters">
-                      {% if item.image_link != "" %}
-                        <div class="col-md-4">
-                            <img src="{{ item.image_link }}" class="card-img" alt="Image of {{ item.title }}">
-                        </div>
-                      {% endif %}
-                      <div class="col-md-8">
-                          <div class="card-body">
-                              <h5 class="card-title"><a href="{% url 'listing' item.pk %}">{{ item.title }}</a></h5>
-                              <p class="card-text">Price: {{ item.get_price }}</p>
-                              <p class="card-text">{{ item.description }}</p>
-                              <p class="card-text"><small class="text-muted">Created: {{ item.creation_time }}</small></p>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          {% endfor %}
-        </div>
+      <h3>{{ username.username }}'s Listings</h3>
 
     {% endif %}
+
+    <div class="mt-4">
+      {% for item in listings %}
+        <div class="card mb-3" style="max-width: 540px;">
+          <div class="row no-gutters">
+            {% if item.image_link != "" %}
+              <div class="col-md-4">
+                <img src="{{ item.image_link }}" class="card-img" alt="Image of {{ item.title }}">
+              </div>
+            {% endif %}
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title"><a href="{% url 'listing' item.pk %}">{{ item.title }}</a></h5>
+                <p class="card-text">Price: {{ item.get_price }}</p>
+                <p class="card-text">{{ item.description }}</p>
+                <p class="card-text"><small class="text-muted">Created: {{ item.creation_time }}</small></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  {% endif %}
+  
 {% endblock %}

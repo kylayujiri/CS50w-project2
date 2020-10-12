@@ -1,52 +1,63 @@
 {% extends "auctions/layout.html" %}
 
 {% block title %}
-Categories - Auctions
+  Categories - Auctions
 {% endblock %}
 
 {% block body %}
-    <h2>Categories</h2>
+  <h2>Categories</h2>
 
-    <form class="mb-4" action="{% url 'categories' %}" method="post">
-        {% csrf_token %}
+  <form class="mb-4" action="{% url 'categories' %}" method="post">
+    {% csrf_token %}
 
-        {% for field in form %}
-          <div class="form-group">
-            {{ field.label_tag }}
-            {{ field }}
+    {% for field in form %}
+      <div class="form-group">
+        {{ field.label_tag }}
+        {{ field }}
+      </div>
+    {% endfor %}
+
+    <input type="submit" value="Go">
+  </form>
+
+  {% if request.method == "POST" %}
+
+    {% if listings is None %}
+
+      <h3>No Results</h3>
+
+    {% else %}
+
+      <h3>{{ listings.count }} Result(s)</h3>
+
+      <div class="mt-4">
+
+        {% for item in listings %}
+        
+          <div class="card mb-3" style="max-width: 540px;">
+            <div class="row no-gutters">
+              {% if item.image_link != "" %}
+                <div class="col-md-4">
+                  <img src="{{ item.image_link }}" class="card-img" alt="Image of {{ item.title }}">
+                </div>
+              {% endif %}
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title"><a href="{% url 'listing' item.pk %}">{{ item.title }}</a></h5>
+                  <p class="card-text">Price: {{ item.get_price }}</p>
+                  <p class="card-text">{{ item.description }}</p>
+                  <p class="card-text"><small class="text-muted">Created: {{ item.creation_time }}</small></p>
+                </div>
+              </div>
+            </div>
           </div>
+
         {% endfor %}
 
-        <input type="submit" value="Go">
-    </form>
+      </div>
 
-    {% if request.method == "POST" %}
-        {% if listings is None %}
-            <h3>No Results</h3>
-        {% else %}
-            <h3>{{ listings.count }} Result(s)</h3>
-            <div class="mt-4">
-              {% for item in listings %}
-                  <div class="card mb-3" style="max-width: 540px;">
-                      <div class="row no-gutters">
-                          {% if item.image_link != "" %}
-                            <div class="col-md-4">
-                                <img src="{{ item.image_link }}" class="card-img" alt="Image of {{ item.title }}">
-                            </div>
-                          {% endif %}
-                          <div class="col-md-8">
-                              <div class="card-body">
-                                  <h5 class="card-title"><a href="{% url 'listing' item.pk %}">{{ item.title }}</a></h5>
-                                  <p class="card-text">Price: {{ item.get_price }}</p>
-                                  <p class="card-text">{{ item.description }}</p>
-                                  <p class="card-text"><small class="text-muted">Created: {{ item.creation_time }}</small></p>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              {% endfor %}
-            </div>
-        {% endif %}
     {% endif %}
+
+  {% endif %}
 
 {% endblock %}

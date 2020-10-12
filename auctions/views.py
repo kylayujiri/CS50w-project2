@@ -6,8 +6,10 @@ from django.urls import reverse
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
+from django.contrib.auth.decorators import login_required
 
 from .models import User, Listing, Bid, Comment
+
 
 class NewListingForm(ModelForm):
     class Meta:
@@ -21,6 +23,7 @@ class NewListingForm(ModelForm):
             'category': forms.Select(attrs={'class': 'form-control'})
         }
 
+
 class NewBidForm(ModelForm):
 
     class Meta:
@@ -30,6 +33,7 @@ class NewBidForm(ModelForm):
             'amount': forms.TextInput(attrs={'placeholder': 'Bid', 'class': 'form-control'}),
             'listing': forms.HiddenInput()
         }
+
 
     def clean_amount(self):
         bid_amount = self.cleaned_data["amount"]
@@ -50,6 +54,7 @@ class CategoryFilter(ModelForm):
             'category': forms.Select(attrs={'class': 'form-control'})
         }
 
+
 class NewCommentForm(ModelForm):
 
     class Meta:
@@ -58,6 +63,7 @@ class NewCommentForm(ModelForm):
         widgets = {
             'text': forms.TextInput(attrs={'placeholder': 'Your Comment', 'class': 'form-control'})
         }
+
 
 def index(request):
     return render(request, "auctions/index.html", {
@@ -81,6 +87,7 @@ def login_view(request):
             return render(request, "auctions/login.html", {
                 "message": "Invalid username and/or password."
             })
+
     else:
         return render(request, "auctions/login.html")
 
@@ -116,12 +123,16 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+
 def categories(request):
     if request.method == "POST":
+
+        # get the form the user submitted
         form = CategoryFilter(request.POST)
 
         if form.is_valid():
 
+            # get the category the user selected
             temp_category = form.save(commit=False)
 
             return render(request, "auctions/categories.html", {
@@ -133,7 +144,8 @@ def categories(request):
         "form": CategoryFilter
     })
 
-# @login_required
+
+@login_required
 def create_listing(request):
     if request.method == "POST":
 
@@ -141,6 +153,7 @@ def create_listing(request):
 
         if form.is_valid():
 
+            # get the info from the form and add user info
             new_listing = form.save(commit=False)
             new_listing.user = request.user
             new_listing.save()
@@ -156,6 +169,7 @@ def create_listing(request):
         "form": NewListingForm
     })
 
+
 def profile(request, username):
     not_found = False
     if request.user.is_authenticated and request.user.username == username:
@@ -163,6 +177,7 @@ def profile(request, username):
         is_my_profile = True
         username = request.user
     else:
+        # the profile we want to view is not the logged in user's profile
         is_my_profile = False
         try:
             username = User.objects.get(username=username)
@@ -175,6 +190,7 @@ def profile(request, username):
         "username": username,
         "listings": Listing.objects.filter(is_active=True, user=User.objects.get(username=username))
     })
+
 
 def watchlist(request, username):
     if request.user.is_authenticated and request.user.username == username:
@@ -193,7 +209,11 @@ def watchlist(request, username):
         "watchlist": User.objects.get(username=username).watchlist.filter(is_active=True)
     })
 
+
 def listing(request, listing_id):
+
+    # try to get the listing from the database
+    # and determine if the listing is the signed in user's listing
     is_my_listing = False
     try:
         requested_listing = Listing.objects.get(pk=listing_id)
@@ -202,17 +222,21 @@ def listing(request, listing_id):
     except Listing.DoesNotExist:
         requested_listing = None
 
+    # determine if the listing is in the signed in user's watchlist
     is_in_my_watchlist = False
     if request.user.is_authenticated and request.user in Listing.objects.get(pk=listing_id).watchers.all():
         is_in_my_watchlist = True
 
-    if request.method == "POST":
+    # POST when user submits a bid, adds to watchlist, removes from watchlist, closes listing, or comments
+    if request.method == "POST" and request.user.is_authenticated:
 
+        # user submitted a bid
         if 'new-bid' in request.POST:
             form = NewBidForm(request.POST)
 
             if form.is_valid():
 
+                # add the bid to the database
                 new_bid = form.save(commit=False)
                 new_bid.user = request.user
                 new_bid.listing = Listing.objects.get(pk=listing_id)
@@ -230,21 +254,29 @@ def listing(request, listing_id):
                     "comments": Comment.objects.filter(listing=requested_listing)
                 })
 
+        # the user added the listing to their watchlist
         elif 'add-watchlist' in request.POST:
             Listing.objects.get(pk=listing_id).watchers.add(request.user)
             return HttpResponseRedirect(reverse("watchlist", args=(request.user.username,)))
+
+        # the user removed the listing from their watchlist
         elif 'remove-watchlist' in request.POST:
             Listing.objects.get(pk=listing_id).watchers.remove(request.user)
             return HttpResponseRedirect(reverse("listing", args=(listing_id,)))
-        elif 'close-listing' in request.POST:
+
+        # the user closed the listing
+        elif 'close-listing' in request.POST and is_my_listing:
             to_close = Listing.objects.get(pk=listing_id)
             to_close.is_active = False
             to_close.save()
             return HttpResponseRedirect(reverse("profile", args=(request.user.username,)))
+
+        # the user commented on the listing
         elif 'post-comment' in request.POST:
             form = NewCommentForm(request.POST)
 
             if form.is_valid():
+                # add comment to database
                 new_comment = form.save(commit=False)
                 new_comment.user = request.user
                 new_comment.listing = Listing.objects.get(pk=listing_id)
