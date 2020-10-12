@@ -14,13 +14,15 @@
     {% if listing is None %}
         <h2>Listing does not exist.</h2>
     {% elif listing.is_active is False %}
-        <h2>{{ listing.title }}</h2>
-        This listing is no longer active.<br>
         {% if user.is_authenticated %}
             {% if listing.get_highest_bidder is not None and listing.get_highest_bidder == user %}
-                <strong>You won the auction!</strong>
+                <div class="alert alert-success">
+                  <strong>You won the auction!</strong>
+                </div>
             {% endif %}
         {% endif %}
+        <h2>{{ listing.title }}</h2>
+        This listing is no longer active.<br>
     {% else %}
 
         <h2>{{ listing.title }}</h2>
@@ -52,16 +54,18 @@
                   </div>
                 {% endfor %}
 
+                {% if bid_form.errors %}
+                    {% for field in bid_form %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-warning">
+                              {{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+
                 <input type="submit" name="new-bid" value="Place Bid">
             </form>
-
-            {% if bid_form.errors %}
-                {% for field in bid_form %}
-                    {% for error in field.errors %}
-                        <p> {{ error }} </p>
-                    {% endfor %}
-                {% endfor %}
-            {% endif %}
 
         {% endif %}
 
